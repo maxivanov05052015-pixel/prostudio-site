@@ -62,6 +62,7 @@ CONFIG.services.forEach(s => {
 // ============ отправка заявки ============
 const form = document.getElementById("orderForm");
 const status = document.getElementById("formStatus");
+const FORM_ENDPOINT = "https://maxveta-prostudio.netlify.app/.netlify/functions/send-order";
 const btn = document.getElementById("submitBtn");
 
 function showStatus(text, ok) {
@@ -107,10 +108,11 @@ form.addEventListener("submit", async (e) => {
   status.hidden = true;
 
   try {
-    // Заказ отправляется на серверную функцию — она доставит его в Telegram
-    const res = await fetch("https://maxveta-prostudio.netlify.app/.netlify/functions/send-order", {
+    // Заказ отправляется на серверную функцию — она доставит его в Telegram.
+    // ВАЖНО: без заголовка Content-Type — тогда браузер не делает CORS-preflight,
+    // и заявка уходит даже с другого домена (сервер всё равно парсит JSON).
+    const res = await fetch(FORM_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const out = await res.json().catch(() => ({}));
