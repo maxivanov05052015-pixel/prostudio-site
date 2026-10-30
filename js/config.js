@@ -25,13 +25,13 @@ const CONFIG = {
 
   // Услуги и цены (₽). Меняются свободно.
   services: [
-    { id: "site",     name: "Сайт / лендинг",              price: "от 5 000 ₽", time: "1–3 дня"  },
-    { id: "bot",      name: "Telegram-бот",                price: "от 3 000 ₽", time: "1–2 дня"  },
-    { id: "design",   name: "Дизайн / баннеры / логотип",  price: "от 1 000 ₽", time: "1 день"   },
-    { id: "text",     name: "Тексты, презентации, документы", price: "от 500 ₽", time: "1 день"  },
-    { id: "excel",    name: "Excel / Google Таблицы, обработка данных", price: "от 700 ₽", time: "1 день" },
-    { id: "script",   name: "Скрипты и автоматизация",     price: "от 1 500 ₽", time: "1–2 дня"  },
-    { id: "video",    name: "Монтаж видео / обложки",      price: "от 1 000 ₽", time: "1–2 дня"  },
+    { id: "site",     name: "Сайт / лендинг",              price: "от 3125 ⭐", time: "1–3 дня"  },
+    { id: "bot",      name: "Telegram-бот",                price: "от 1875 ⭐", time: "1–2 дня"  },
+    { id: "design",   name: "Дизайн / баннеры / логотип",  price: "от 625 ⭐", time: "1 день"   },
+    { id: "text",     name: "Тексты, презентации, документы", price: "от 313 ⭐", time: "1 день"  },
+    { id: "excel",    name: "Excel / Google Таблицы, обработка данных", price: "от 438 ⭐", time: "1 день" },
+    { id: "script",   name: "Скрипты и автоматизация",     price: "от 938 ⭐", time: "1–2 дня"  },
+    { id: "video",    name: "Монтаж видео / обложки",      price: "от 625 ⭐", time: "1–2 дня"  },
     { id: "other",    name: "Другое",                      price: "по договорённости", time: "—" },
   ],
 };
