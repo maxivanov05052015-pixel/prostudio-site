@@ -1,6 +1,6 @@
 // ProStudio Service Worker — офлайн-кэш сайта.
 // Версия кэша меняйте при обновлении статики, чтобы клиенты получили новое.
-const VERSION = "prostudio-v2";
+const VERSION = "prostudio-v3";
 const CORE = [
   "./",
   "index.html",
