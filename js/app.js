@@ -8,6 +8,26 @@ document.getElementById("contactLink").href =
 document.getElementById("botTg").textContent = "@" + CONFIG.botTg;
 document.getElementById("botLink").href = "https://t.me/" + CONFIG.botTg;
 
+// ============ тёмная/светлая тема (тёмная по умолчанию) ============
+const themeToggle = document.getElementById("themeToggle");
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+const THEME_COLORS = { dark: "#0d1220", light: "#f6f8fc" };
+
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  if (themeMeta) themeMeta.content = THEME_COLORS[t];
+}
+function savedTheme() {
+  try { return localStorage.getItem("ps-theme"); } catch (e) { return null; }
+}
+applyTheme(savedTheme() === "light" ? "light" : "dark"); // по умолчанию — тёмная
+
+themeToggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  applyTheme(next);
+  try { localStorage.setItem("ps-theme", next); } catch (e) {}
+});
+
 // Яндекс.Метрика (подключается, если в config.js заполнен metrikaId)
 if (CONFIG.metrikaId) {
   const s = document.createElement("script");
@@ -37,9 +57,10 @@ document.querySelectorAll(".work").forEach(w => {
 
 // карточки услуг
 const grid = document.getElementById("servicesGrid");
-CONFIG.services.forEach(s => {
+CONFIG.services.forEach((s, i) => {
   const card = document.createElement("div");
-  card.className = "service";
+  card.className = "service reveal";
+  card.style.setProperty("--reveal-delay", (i * 0.06).toFixed(2) + "s");
   card.innerHTML = `<h3>${s.name}</h3>
     <span class="service__price">${s.price}</span>
     <span class="service__time">${s.time}</span>`;
@@ -58,6 +79,117 @@ CONFIG.services.forEach(s => {
   opt.textContent = `${s.name} — ${s.price}`;
   select.appendChild(opt);
 });
+
+// ============ диаграмма-статистика ============
+const stats = CONFIG.stats || { servicePopularity: [], deadlines: [] };
+
+// полосчатая диаграмма: популярность услуг
+const barsBox = document.getElementById("chartServices");
+stats.servicePopularity.forEach((d, i) => {
+  const row = document.createElement("div");
+  row.className = "bar";
+  row.innerHTML = `
+    <span class="bar__name">${d.name}</span>
+    <span class="bar__track"><span class="bar__fill" style="--bar-delay: ${(i * 0.1).toFixed(2)}s"></span></span>
+    <span class="bar__val" data-target="${d.value}">0%</span>`;
+  barsBox.appendChild(row);
+});
+
+// кольцевая диаграмма: типичные сроки
+const donutSvg = document.querySelector(".chart-donut svg");
+const legend = document.getElementById("donutLegend");
+const donutCenterVal = document.getElementById("donutValue");
+const donutCenterLabel = document.getElementById("donutLabel");
+const C = 2 * Math.PI * 80; // длина окружности r=80
+
+let accumulated = 0;
+stats.deadlines.forEach((d, i) => {
+  const frac = d.value / 100;
+  const seg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  seg.setAttribute("class", "donut__seg");
+  seg.setAttribute("cx", "100");
+  seg.setAttribute("cy", "100");
+  seg.setAttribute("r", "80");
+  seg.style.stroke = d.color;
+  seg.style.strokeDasharray = `${(frac * C).toFixed(2)} ${(C - frac * C).toFixed(2)}`;
+  seg.style.setProperty("--donut-offset", (-accumulated * C).toFixed(2));
+  seg.style.strokeDashoffset = C; // до анимации — пусто
+  seg.dataset.offset = (-accumulated * C).toFixed(2);
+  seg.dataset.name = d.name;
+  seg.dataset.value = d.value;
+  donutSvg.appendChild(seg);
+  accumulated += frac;
+
+  const item = document.createElement("div");
+  item.innerHTML = `<i style="background:${d.color}"></i>${d.name} — ${d.value}%`;
+  item.addEventListener("mouseenter", () => highlightSeg(i));
+  item.addEventListener("mouseleave", () => highlightSeg(-1));
+  item.dataset.idx = i;
+  legend.appendChild(item);
+});
+
+function highlightSeg(idx) {
+  donutSvg.querySelectorAll(".donut__seg").forEach((seg, i) => {
+    seg.style.opacity = idx === -1 || idx === i ? "1" : ".25";
+    if (idx === i) {
+      donutCenterVal.textContent = seg.dataset.value + "%";
+      donutCenterLabel.textContent = seg.dataset.name;
+    }
+  });
+  if (idx === -1) {
+    donutCenterVal.textContent = "—";
+    donutCenterLabel.textContent = "наведите";
+  }
+  legend.querySelectorAll("div").forEach((el, i) => {
+    el.classList.toggle("is-active", i === idx);
+  });
+}
+
+// ============ появление блоков при прокрутке ============
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    en.target.classList.add("is-visible");
+    io.unobserve(en.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+// отдельный наблюдатель для диаграмм: запускаем анимацию один раз
+const chartsIO = new IntersectionObserver((entries) => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    en.target.classList.add("is-visible");
+
+    if (en.target.id === "chartServices") {
+      en.target.querySelectorAll(".bar__fill").forEach(f => {
+        f.style.width = f.closest(".bar").querySelector(".bar__val").dataset.target + "%";
+      });
+      // счётчики процентов
+      en.target.querySelectorAll(".bar__val").forEach(el => {
+        const target = +el.dataset.target;
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min((t - t0) / 1100, 1);
+          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + "%";
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }
+
+    if (en.target.classList.contains("chart-donut")) {
+      en.target.querySelectorAll(".donut__seg").forEach((seg, i) => {
+        setTimeout(() => { seg.style.strokeDashoffset = seg.dataset.offset; }, i * 120);
+      });
+    }
+
+    chartsIO.unobserve(en.target);
+  });
+}, { threshold: 0.35 });
+chartsIO.observe(barsBox);
+chartsIO.observe(document.querySelector(".chart-donut"));
 
 // ============ отправка заявки ============
 const form = document.getElementById("orderForm");
@@ -128,3 +260,10 @@ form.addEventListener("submit", async (e) => {
   btn.disabled = false;
   btn.textContent = "Отправить заявку";
 });
+
+// ============ PWA: service worker ============
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  navigator.serviceWorker.register("sw.js").catch(err =>
+    console.warn("SW registration failed:", err)
+  );
+}
