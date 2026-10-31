@@ -68,15 +68,23 @@
 </div>
 
 <div class="grid">
-  <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за день</div></div>
-  <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за месяц</div></div>
+  <div class="card"><button class="edit" data-focus="inp-vday" title="Изменить">✏</button>
+    <div class="num blue" id="num-vday">0</div><div class="lbl">Посетителей за день</div>
+    <div class="hint">Яндекс.Метрика № 113954543</div></div>
+  <div class="card"><button class="edit" data-focus="inp-vmonth" title="Изменить">✏</button>
+    <div class="num blue" id="num-vmonth">0</div><div class="lbl">Посетителей за месяц</div>
+    <div class="hint">Яндекс.Метрика № 113954543</div></div>
 </div>
 
 <div id="panel" hidden>
   <h3>📈 Доходы по месяцам (₽)</h3>
   <div class="prow" id="month-inputs"></div>
-  <h3>🤖 Токены ZCode за октябрь (для расчёта расходов)</h3>
+  <h3>👥 Посетители (из Яндекс.Метрики)</h3>
   <div class="prow">
+    <label>За день<input type="number" min="0" id="inp-vday"></label>
+    <label>За месяц<input type="number" min="0" id="inp-vmonth"></label>
+  </div>
+  <h3>🤖 Токены ZCode за октябрь (для расчёта расходов)</h3>  <div class="prow">
     <label>Входные токены<input type="number" min="0" id="inp-tin" placeholder="× 6 ₽/1M"></label>
     <label>Выходные токены<input type="number" min="0" id="inp-tout" placeholder="× 15 ₽/1M"></label>
     <label>Кеш-токены<input type="number" min="0" id="inp-tcache" placeholder="× 3 ₽/1M"></label>
@@ -112,6 +120,7 @@
 <div class="note">💡 Яндекс.Метрика подключена (счётчик 113954543, сайт prostudio.dpdns.org) — визиты считаются с 31.10.2026. Карточки посетителей покажут числа, когда я подключу выгрузку данных из Метрики.<br>
 📈 Доходы взяты из finances.md — пока оплат не было, все месяцы по нулям. Как только клиент заплатит, сумма появится здесь.<br>
 🤖 Расходы на ZCode считаются по тарифам API: выходные 15 ₽ / входные 6 ₽ / кеш 3 ₽ за 1 млн токенов — впиши токены за месяц через ✏.<br>
+👥 Числа посетителей — из Яндекс.Метрики (счётчик 113954543). Счётчик подключён 31.10.2026, отчёты агрегируются с задержкой до пары часов: попроси меня «обновить статистику», и я перезалью свежие числа (или впиши сам через ✏).<br>
 💾 Изменённые суммы сохраняются в этом браузере (localStorage); «Сбросить» возвращает значения из finances.md.</div>
 
 <script>
@@ -120,14 +129,19 @@
   var MONTHS = [["2026-05","Май"],["2026-06","Июнь"],["2026-07","Июль"],["2026-08","Август"],["2026-09","Сентябрь"],["2026-10","Октябрь"]];
   var PRICE = { out: 15, in: 6, cache: 3 }; // ₽ за 1 млн токенов
   // данные из finances.md на 31.10.2026: оплат ещё не было
-  var DEF = { earned: 0, months: {}, tokens: { in: 0, out: 0, cache: 0 } };
+  // посетители — из Яндекс.Метрики № 113954543 (счётчик подключён 31.10.2026,
+  // отчёты агрегируются с задержкой; обновляются, когда просишь меня «обновить статистику»)
+  var DEF = { earned: 0, visitors: { day: 0, month: 0 }, months: {}, tokens: { in: 0, out: 0, cache: 0 } };
   MONTHS.forEach(function(m){ DEF.months[m[0]] = 0; });
 
   var KEY = "prostudio-stats-v1";
   function load(){
     try {
       var s = JSON.parse(localStorage.getItem(KEY));
-      if (s && s.months && s.tokens) return s;
+      if (s && s.months && s.tokens) {
+        if (!s.visitors) s.visitors = { day: 0, month: 0 };
+        return s;
+      }
     } catch(e) {}
     return JSON.parse(JSON.stringify(DEF));
   }
@@ -145,6 +159,8 @@
     document.getElementById("num-earned").textContent = fmt(S.earned);
     document.getElementById("num-mincome").textContent = fmt(mi);
     document.getElementById("num-zcode").textContent = fmt(zc);
+    document.getElementById("num-vday").textContent = (S.visitors.day || 0).toLocaleString("ru-RU");
+    document.getElementById("num-vmonth").textContent = (S.visitors.month || 0).toLocaleString("ru-RU");
     var netEl = document.getElementById("num-net");
     netEl.textContent = (net < 0 ? "−" : "") + fmt(Math.abs(net));
     netEl.className = "num " + (net > 0 ? "green" : (net < 0 ? "red" : "green"));
@@ -186,6 +202,8 @@
     document.getElementById("inp-tin").value = S.tokens.in || "";
     document.getElementById("inp-tout").value = S.tokens.out || "";
     document.getElementById("inp-tcache").value = S.tokens.cache || "";
+    document.getElementById("inp-vday").value = S.visitors.day || "";
+    document.getElementById("inp-vmonth").value = S.visitors.month || "";
     document.getElementById("inp-earned").value = S.earned || "";
   }
   function openPanel(focusId){ panel.hidden = false; fillPanel(); if (focusId) document.getElementById(focusId).focus(); }
@@ -198,6 +216,7 @@
   document.getElementById("btn-save").onclick = function(){
     MONTHS.forEach(function(m){ S.months[m[0]] = num("inp-m-" + m[0]); });
     S.tokens = { in: num("inp-tin"), out: num("inp-tout"), cache: num("inp-tcache") };
+    S.visitors = { day: num("inp-vday"), month: num("inp-vmonth") };
     S.earned = num("inp-earned");
     save(); render(); panel.hidden = true;
   };
