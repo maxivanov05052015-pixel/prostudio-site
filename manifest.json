@@ -1,0 +1,22 @@
+{
+  "name": "ProStudio — цифровые услуги под ключ",
+  "short_name": "ProStudio",
+  "description": "Сайты, Telegram-боты, дизайн, тексты и автоматизация. Оплата после результата — звёздами Telegram.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d1220",
+  "theme_color": "#0d1220",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Оставить заявку", "url": "./#order" },
+    { "name": "Услуги и цены", "url": "./#services" }
+  ]
+}
