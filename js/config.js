@@ -34,24 +34,4 @@ const CONFIG = {
     { id: "video",    name: "Монтаж видео / обложки",      price: "от 625 ⭐", time: "1–2 дня"  },
     { id: "other",    name: "Другое",                      price: "по договорённости", time: "—" },
   ],
-
-  // Данные для диаграмм на главной («Студия в цифрах»). Меняются свободно.
-  stats: {
-    // Популярность услуг, % заказов (сумма не обязана быть ровно 100)
-    servicePopularity: [
-      { name: "Сайты / лендинги",  value: 30 },
-      { name: "Telegram-боты",     value: 25 },
-      { name: "Дизайн",            value: 18 },
-      { name: "Скрипты",           value: 12 },
-      { name: "Тексты",            value: 8  },
-      { name: "Таблицы / Excel",   value: 7  },
-    ],
-    // Типичные сроки, % заказов (сумма = 100)
-    deadlines: [
-      { name: "1 день",   value: 35, color: "#4f8cff" },
-      { name: "1–2 дня",  value: 40, color: "#8b5cf6" },
-      { name: "2–3 дня",  value: 20, color: "#22d3ee" },
-      { name: "Срочно",   value: 5,  color: "#f59e0b" },
-    ],
-  },
 };
