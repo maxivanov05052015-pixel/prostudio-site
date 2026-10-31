@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>ProStudio · Статистика</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Segoe UI",system-ui,sans-serif; background:#0d1117; color:#e6edf3; padding:20px; }
+  h1 { font-size:1.4rem; margin-bottom:4px; } .sub{color:#8b97a8;font-size:.85rem;margin-bottom:20px;}
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
+  .card { background:#161d2a; border:1px solid #263041; border-radius:14px; padding:16px; }
+  .card .num { font-size:1.8rem; font-weight:800; }
+  .card .lbl { color:#8b97a8; font-size:.8rem; margin-top:4px; }
+  .green{color:#2ecc71}.blue{color:#4f8cff}.yellow{color:#ffd60a}
+  h2 { font-size:1rem; margin:18px 0 10px; color:#8b97a8; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  td,th { padding:8px; border-bottom:1px solid #263041; text-align:left; }
+  .st-ok{color:#2ecc71}.st-wait{color:#ffd60a}
+  .note { color:#8b97a8; font-size:.75rem; margin-top:16px; }
+</style>
+</head>
+<body>
+<h1>📊 Статистика ProStudio</h1>
+<div class="sub">обновляется, когда ты пишешь мне · данные на 30.10.2026</div>
+
+<div class="grid">
+  <div class="card"><div class="num yellow">0 ₽</div><div class="lbl">Заработано всего</div></div>
+  <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за день</div></div>
+  <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за месяц</div></div>
+  <div class="card"><div class="num green">0 ₽</div><div class="lbl">Траты на ZCode (мес)</div></div>
+</div>
+
+<h2>💼 Заказы</h2>
+<table>
+  <tr><th>Клиент</th><th>Заказ</th><th>Статус</th></tr>
+  <tr><td>Елена @nontiscordardime_1</td><td>Сайт, от 5000 ₽ (≈3125 ⭐)</td><td class="st-wait">ждём ответ</td></tr>
+</table>
+
+<h2>📣 Реклама</h2>
+<table>
+  <tr><th>Площадка</th><th>Статус</th></tr>
+  <tr><td>Канал t.me/prostudioshopps</td><td class="st-ok">6 постов опубликовано</td></tr>
+  <tr><td>Avito</td><td class="st-wait">ждём аккаунт родителей</td></tr>
+  <tr><td>Чаты-барахолки</td><td class="st-wait">1 чат забанен до 2.11, ищем другие</td></tr>
+</table>
+
+<div class="note">💡 Посетители появятся после подключения Яндекс.Метрики (нужен номер счётчика — metrika.yandex.ru → «Добавить счётчик» → пришли мне номер). Доход и траты обновляются, когда пишешь мне в ZCode.</div>
+</body>
+</html>
