@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ProStudio — цифровые услуги под ключ</title>
   <meta name="description" content="Сайты, Telegram-боты, дизайн, тексты и автоматизация. Быстро, качественно, с гарантией. Оплата после результата.">
+  <!-- Тема применяется до отрисовки, чтобы не мигало: тёмная по умолчанию -->
+  <script>
+    (function () {
+      var t = "dark";
+      try { t = localStorage.getItem("ps-theme") || "dark"; } catch (e) {}
+      document.documentElement.dataset.theme = t === "light" ? "light" : "dark";
+    })();
+  </script>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#0d1220">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ProStudio">
   <meta property="og:title" content="ProStudio — сайты, боты, дизайн под ключ">
@@ -22,9 +34,14 @@
       <a class="logo" href="#top">⚡ <span id="brandName">ProStudio</span></a>
       <nav class="nav">
         <a href="#services">Услуги</a>
+        <a href="#stats">Статистика</a>
         <a href="#works">Работы</a>
         <a href="#order">Заказать</a>
       </nav>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Переключить тему" title="Переключить тему">
+        <span class="theme-toggle__icon theme-toggle__icon--sun">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--moon">🌙</span>
+      </button>
     </div>
   </header>
 
@@ -32,17 +49,21 @@
 
     <!-- ГЛАВНЫЙ ЭКРАН -->
     <section class="hero">
+      <div class="hero__bg" aria-hidden="true">
+        <div class="hero__blob hero__blob--1"></div>
+        <div class="hero__blob hero__blob--2"></div>
+      </div>
       <div class="container">
-        <h1>Ваш заказ — готов <span class="accent">завтра</span></h1>
-        <p class="hero__sub">
+        <h1 class="reveal">Ваш заказ — готов <span class="accent">завтра</span></h1>
+        <p class="hero__sub reveal">
           Сайты, боты, дизайн, тексты, таблицы и автоматизация.
           Вы оставляете заявку — мы делаем. Оплата после согласования результата.
         </p>
-        <div class="hero__actions">
+        <div class="hero__actions reveal">
           <a href="#order" class="btn btn--primary">Оставить заявку</a>
           <a href="#services" class="btn btn--ghost">Посмотреть услуги</a>
         </div>
-        <div class="hero__stats">
+        <div class="hero__stats reveal">
           <div><b>72 ч</b><span>типичный срок</span></div>
           <div><b>100%</b><span>предоплата не нужна</span></div>
           <div><b>∞</b><span>правки до результата</span></div>
@@ -53,21 +74,46 @@
     <!-- УСЛУГИ -->
     <section id="services" class="section">
       <div class="container">
-        <h2>Услуги и цены</h2>
-        <p class="section__sub">Нажмите на услугу, чтобы сразу перейти к заявке.</p>
+        <h2 class="reveal">Услуги и цены</h2>
+        <p class="section__sub reveal">Нажмите на услугу, чтобы сразу перейти к заявке.</p>
         <div class="services" id="servicesGrid"><!-- заполняется скриптом --></div>
       </div>
     </section>
 
-    <!-- КАК РАБОТАЕМ -->
-    <section id="how" class="section section--alt">
+    <!-- ДИАГРАММА-СТАТИСТИКА -->
+    <section id="stats" class="section section--alt">
       <div class="container">
-        <h2>Как это работает</h2>
+        <h2 class="reveal">Студия в цифрах</h2>
+        <p class="section__sub reveal">Что заказывают чаще и сколько это занимает времени.</p>
+        <div class="stats">
+          <div class="stats__card reveal">
+            <h3>Популярные услуги</h3>
+            <div class="chart-bars" id="chartServices"><!-- заполняется скриптом --></div>
+          </div>
+          <div class="stats__card reveal">
+            <h3>Типичные сроки</h3>
+            <div class="chart-donut">
+              <svg viewBox="0 0 200 200" role="img" aria-label="Диаграмма типичных сроков">
+                <circle class="donut__ring" cx="100" cy="100" r="80"></circle>
+                <circle class="donut__seg" id="donutSeg" cx="100" cy="100" r="80"></circle>
+              </svg>
+              <div class="donut__legend" id="donutLegend"><!-- заполняется скриптом --></div>
+              <div class="donut__center"><b id="donutValue">—</b><span id="donutLabel">наведите</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАК РАБОТАЕМ -->
+    <section id="how" class="section">
+      <div class="container">
+        <h2 class="reveal">Как это работает</h2>
         <div class="steps">
-          <div class="step"><div class="step__num">1</div><h3>Заявка</h3><p>Вы описываете задачу в форме ниже — 2 минуты.</p></div>
-          <div class="step"><div class="step__num">2</div><h3>Смета</h3><p>Мы связываемся с вами, уточняем детали и называем точную цену и срок.</p></div>
-          <div class="step"><div class="step__num">3</div><h3>Работа</h3><p>Выполняем заказ и показываем промежуточный результат.</p></div>
-          <div class="step"><div class="step__num">4</div><h3>Оплата</h3><p>Вы принимаете работу, вносите оплату, получаете все файлы.</p></div>
+          <div class="step reveal"><div class="step__num">1</div><h3>Заявка</h3><p>Вы описываете задачу в форме ниже — 2 минуты.</p></div>
+          <div class="step reveal"><div class="step__num">2</div><h3>Смета</h3><p>Мы связываемся с вами, уточняем детали и называем точную цену и срок.</p></div>
+          <div class="step reveal"><div class="step__num">3</div><h3>Работа</h3><p>Выполняем заказ и показываем промежуточный результат.</p></div>
+          <div class="step reveal"><div class="step__num">4</div><h3>Оплата</h3><p>Вы принимаете работу, вносите оплату, получаете все файлы.</p></div>
         </div>
       </div>
     </section>
@@ -75,14 +121,14 @@
     <!-- НАШИ РАБОТЫ -->
     <section id="works" class="section section--alt">
       <div class="container">
-        <h2>Наши работы</h2>
-        <p class="section__sub">Примеры того, что мы делаем. Нажмите на работу, чтобы обсудить похожую.</p>
+        <h2 class="reveal">Наши работы</h2>
+        <p class="section__sub reveal">Примеры того, что мы делаем. Нажмите на работу, чтобы обсудить похожую.</p>
         <div class="works">
-          <figure class="work" data-service="site">
+          <figure class="work reveal" data-service="site">
             <img src="img/works-coffee.png" alt="Лендинг для кофейни" loading="lazy">
             <figcaption><b>Лендинг для кофейни</b><span>дизайн + вёрстка, 2 дня</span></figcaption>
           </figure>
-          <figure class="work" data-service="bot">
+          <figure class="work reveal" data-service="bot">
             <img src="img/works-bot.png" alt="Telegram-бот для записи" loading="lazy">
             <figcaption><b>Telegram-бот для барбершопа</b><span>запись клиентов, 2 дня</span></figcaption>
           </figure>
@@ -91,12 +137,12 @@
     </section>
 
     <!-- ФОРМА ЗАКАЗА -->
-    <section id="order" class="section section--alt">
+    <section id="order" class="section">
       <div class="container container--narrow">
-        <h2>Оставить заявку</h2>
-        <p class="section__sub">Заполните форму — и мы свяжемся с вами в течение часа.</p>
+        <h2 class="reveal">Оставить заявку</h2>
+        <p class="section__sub reveal">Заполните форму — и мы свяжемся с вами в течение часа.</p>
 
-        <form id="orderForm" class="form" novalidate>
+        <form id="orderForm" class="form reveal" novalidate>
           <label>Ваше имя
             <input type="text" name="name" placeholder="Как к вам обращаться?" required>
           </label>
@@ -122,8 +168,8 @@
                 <option>Срочно (до 12 часов)</option>
               </select>
             </label>
-            <label>Ориентир бюджета (₽)
-              <input type="number" name="budget" min="0" placeholder="Например, 3000">
+            <label>Ориентир бюджета (⭐ Stars)
+              <input type="number" name="budget" min="0" placeholder="Например, 500">
             </label>
           </div>
 
@@ -137,11 +183,11 @@
     <!-- FAQ -->
     <section class="section section--alt">
       <div class="container container--narrow">
-        <h2>Частые вопросы</h2>
-        <details class="faq"><summary>Нужна ли предоплата?</summary><p>Нет. Оплата только после того, как вы увидели результат и приняли его.</p></details>
-        <details class="faq"><summary>А если не понравится?</summary><p>Правки входят в цену. Работу сдаём только когда вас всё устраивает.</p></details>
-        <details class="faq"><summary>Как происходит оплата?</summary><p>Только звёздами Telegram (⭐ Stars) — прямо в нашем боте @ProStudiomaxbot. Предоплата не нужна: сначала видишь результат, потом платишь звёздами. Цены указаны в звёздах Telegram ⭐ (1 ★ ≈ 1,6 ₽).</p></details>
-        <details class="faq"><summary>Что с конфиденциальностью?</summary><p>Исходники и материалы полностью ваши. Можем подписать NDA.</p></details>
+        <h2 class="reveal">Частые вопросы</h2>
+        <details class="faq reveal"><summary>Нужна ли предоплата?</summary><p>Нет. Оплата только после того, как вы увидели результат и приняли его.</p></details>
+        <details class="faq reveal"><summary>А если не понравится?</summary><p>Правки входят в цену. Работу сдаём только когда вас всё устраивает.</p></details>
+        <details class="faq reveal"><summary>Как происходит оплата?</summary><p>Только звёздами Telegram (⭐ Stars) — прямо в нашем боте @ProStudiomaxbot. Предоплата не нужна: сначала видишь результат, потом платишь звёздами. Цены указаны в звёздах Telegram ⭐ (1 ★ ≈ 1,6 ₽).</p></details>
+        <details class="faq reveal"><summary>Что с конфиденциальностью?</summary><p>Исходники и материалы полностью ваши. Можем подписать NDA.</p></details>
       </div>
     </section>
 
