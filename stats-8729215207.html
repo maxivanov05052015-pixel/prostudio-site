@@ -10,27 +10,80 @@
   body { font-family:"Segoe UI",system-ui,sans-serif; background:#0d1117; color:#e6edf3; padding:20px; }
   h1 { font-size:1.4rem; margin-bottom:4px; } .sub{color:#8b97a8;font-size:.85rem;margin-bottom:20px;}
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
-  .card { background:#161d2a; border:1px solid #263041; border-radius:14px; padding:16px; }
-  .card .num { font-size:1.8rem; font-weight:800; }
+  .card { background:#161d2a; border:1px solid #263041; border-radius:14px; padding:16px; position:relative; }
+  .card .num { font-size:1.6rem; font-weight:800; }
   .card .lbl { color:#8b97a8; font-size:.8rem; margin-top:4px; }
-  .green{color:#2ecc71}.blue{color:#4f8cff}.yellow{color:#ffd60a}
-  h2 { font-size:1rem; margin:18px 0 10px; color:#8b97a8; }
+  .card .hint { color:#5c6a7d; font-size:.68rem; margin-top:2px; line-height:1.35; }
+  .green{color:#2ecc71}.blue{color:#4f8cff}.yellow{color:#ffd60a}.red{color:#ff5c5c}
+  h2 { font-size:1rem; margin:18px 0 10px; color:#8b97a8; display:flex; align-items:center; gap:10px; }
   table { width:100%; border-collapse:collapse; font-size:.85rem; }
   td,th { padding:8px; border-bottom:1px solid #263041; text-align:left; }
   .st-ok{color:#2ecc71}.st-wait{color:#ffd60a}
-  .note { color:#8b97a8; font-size:.75rem; margin-top:16px; }
+  .note { color:#8b97a8; font-size:.75rem; margin-top:16px; line-height:1.5; }
+  .edit { position:absolute; top:8px; right:8px; background:#263041; border:1px solid #3a465c; color:#8b97a8;
+          border-radius:8px; padding:2px 8px; font-size:.75rem; cursor:pointer; }
+  .edit:hover { color:#e6edf3; border-color:#4f8cff; }
+  .btn { background:#263041; border:1px solid #3a465c; color:#e6edf3; border-radius:8px; padding:6px 14px;
+         font-size:.8rem; cursor:pointer; font-weight:600; }
+  .btn:hover { border-color:#4f8cff; }
+  .btn.save { background:#1d3a2a; border-color:#2ecc71; color:#2ecc71; }
+  .btn.danger { color:#ff5c5c; border-color:#5c3030; }
+  #panel { background:#161d2a; border:1px solid #263041; border-radius:14px; padding:16px; margin-bottom:20px; }
+  #panel h3 { font-size:.85rem; color:#8b97a8; margin:12px 0 8px; }
+  #panel h3:first-child { margin-top:0; }
+  .prow { display:flex; flex-wrap:wrap; gap:10px; }
+  .prow label { display:flex; flex-direction:column; gap:4px; font-size:.75rem; color:#8b97a8; min-width:110px; flex:1; }
+  .prow input { background:#0d1117; border:1px solid #263041; color:#e6edf3; border-radius:8px; padding:7px 9px; font-size:.85rem; width:100%; }
+  .prow input:focus { outline:none; border-color:#4f8cff; }
+  .pbtns { display:flex; gap:10px; margin-top:14px; }
+  #chart-wrap { background:#161d2a; border:1px solid #263041; border-radius:14px; padding:14px; }
+  #chart svg { width:100%; height:auto; display:block; }
 </style>
 </head>
 <body>
 <h1>📊 Статистика ProStudio</h1>
-<div class="sub">обновляется, когда ты пишешь мне · данные на 30.10.2026</div>
+<div class="sub">обновляется, когда ты пишешь мне · данные на 31.10.2026</div>
 
 <div class="grid">
-  <div class="card"><div class="num yellow">0 ₽</div><div class="lbl">Заработано всего</div></div>
+  <div class="card"><button class="edit" data-focus="inp-earned" title="Изменить">✏</button>
+    <div class="num yellow" id="num-earned">0 ₽</div><div class="lbl">Заработано всего</div></div>
+  <div class="card"><button class="edit" data-focus="inp-mincome" title="Изменить">✏</button>
+    <div class="num blue" id="num-mincome">0 ₽</div><div class="lbl">Доход за октябрь</div></div>
+  <div class="card"><button class="edit" data-focus="inp-tin" title="Изменить">✏</button>
+    <div class="num yellow" id="num-zcode">0 ₽</div><div class="lbl">Расходы на ZCode (мес)</div>
+    <div class="hint">API: 15 ₽/1M вых. · 6 ₽/1M вх. · 3 ₽/1M кеш</div></div>
+  <div class="card">
+    <div class="num green" id="num-net">0 ₽</div><div class="lbl">Чистая прибыль (мес)</div>
+    <div class="hint">доход за месяц − расходы на ZCode</div></div>
+</div>
+
+<div class="grid">
   <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за день</div></div>
   <div class="card"><div class="num blue">—</div><div class="lbl">Посетителей за месяц</div></div>
-  <div class="card"><div class="num green">0 ₽</div><div class="lbl">Траты на ZCode (мес)</div></div>
 </div>
+
+<div id="panel" hidden>
+  <h3>📈 Доходы по месяцам (₽)</h3>
+  <div class="prow" id="month-inputs"></div>
+  <h3>🤖 Токены ZCode за октябрь (для расчёта расходов)</h3>
+  <div class="prow">
+    <label>Входные токены<input type="number" min="0" id="inp-tin" placeholder="× 6 ₽/1M"></label>
+    <label>Выходные токены<input type="number" min="0" id="inp-tout" placeholder="× 15 ₽/1M"></label>
+    <label>Кеш-токены<input type="number" min="0" id="inp-tcache" placeholder="× 3 ₽/1M"></label>
+  </div>
+  <h3>💰 Заработано всего (₽)</h3>
+  <div class="prow">
+    <label>Сумма<input type="number" min="0" id="inp-earned"></label>
+  </div>
+  <div class="pbtns">
+    <button class="btn save" id="btn-save">💾 Сохранить</button>
+    <button class="btn" id="btn-close">Закрыть</button>
+    <button class="btn danger" id="btn-reset">↺ Сбросить к finances.md</button>
+  </div>
+</div>
+
+<h2>📈 Доходы по месяцам <button class="btn" id="btn-open-panel">✏ Изменить</button></h2>
+<div id="chart-wrap"><div id="chart"></div></div>
 
 <h2>💼 Заказы</h2>
 <table>
@@ -46,6 +99,106 @@
   <tr><td>Чаты-барахолки</td><td class="st-wait">1 чат забанен до 2.11, ищем другие</td></tr>
 </table>
 
-<div class="note">💡 Посетители появятся после подключения Яндекс.Метрики (нужен номер счётчика — metrika.yandex.ru → «Добавить счётчик» → пришли мне номер). Доход и траты обновляются, когда пишешь мне в ZCode.</div>
+<div class="note">💡 Посетители появятся после подключения Яндекс.Метрики (нужен номер счётчика — metrika.yandex.ru → «Добавить счётчик» → пришли мне номер).<br>
+📈 Доходы взяты из finances.md — пока оплат не было, все месяцы по нулям. Как только клиент заплатит, сумма появится здесь.<br>
+🤖 Расходы на ZCode считаются по тарифам API: выходные 15 ₽ / входные 6 ₽ / кеш 3 ₽ за 1 млн токенов — впиши токены за месяц через ✏.<br>
+💾 Изменённые суммы сохраняются в этом браузере (localStorage); «Сбросить» возвращает значения из finances.md.</div>
+
+<script>
+(function(){
+  var CUR = "2026-10";
+  var MONTHS = [["2026-05","Май"],["2026-06","Июнь"],["2026-07","Июль"],["2026-08","Август"],["2026-09","Сентябрь"],["2026-10","Октябрь"]];
+  var PRICE = { out: 15, in: 6, cache: 3 }; // ₽ за 1 млн токенов
+  // данные из finances.md на 31.10.2026: оплат ещё не было
+  var DEF = { earned: 0, months: {}, tokens: { in: 0, out: 0, cache: 0 } };
+  MONTHS.forEach(function(m){ DEF.months[m[0]] = 0; });
+
+  var KEY = "prostudio-stats-v1";
+  function load(){
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY));
+      if (s && s.months && s.tokens) return s;
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEF));
+  }
+  var S = load();
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+
+  function fmt(n){ return Math.round(n).toLocaleString("ru-RU") + " ₽"; }
+  function num(id){ var v = parseFloat(document.getElementById(id).value); return isFinite(v) && v > 0 ? v : 0; }
+  function zcodeCost(){
+    return S.tokens.out/1e6*PRICE.out + S.tokens.in/1e6*PRICE.in + S.tokens.cache/1e6*PRICE.cache;
+  }
+
+  function render(){
+    var mi = S.months[CUR] || 0, zc = zcodeCost(), net = mi - zc;
+    document.getElementById("num-earned").textContent = fmt(S.earned);
+    document.getElementById("num-mincome").textContent = fmt(mi);
+    document.getElementById("num-zcode").textContent = fmt(zc);
+    var netEl = document.getElementById("num-net");
+    netEl.textContent = (net < 0 ? "−" : "") + fmt(Math.abs(net));
+    netEl.className = "num " + (net > 0 ? "green" : (net < 0 ? "red" : "green"));
+    renderChart();
+  }
+
+  function renderChart(){
+    var W = 600, H = 200, pad = 30, bw = 56;
+    var vals = MONTHS.map(function(m){ return S.months[m[0]] || 0; });
+    var max = Math.max.apply(null, vals.concat([1]));
+    var step = (W - 2*pad) / MONTHS.length;
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<line x1="' + pad + '" y1="' + (H-30) + '" x2="' + (W-pad) + '" y2="' + (H-30) + '" stroke="#263041" stroke-width="1"/>';
+    MONTHS.forEach(function(m, i){
+      var v = vals[i], h = Math.round(v / max * (H - 80));
+      var x = pad + i*step + (step - bw)/2, y = H - 30 - h;
+      var last = m[0] === CUR;
+      svg += '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + Math.max(h, 2) + '" rx="6" fill="' + (last ? "#2ecc71" : "#4f8cff") + '" opacity="' + (h ? 1 : 0.35) + '"/>';
+      svg += '<text x="' + (x + bw/2) + '" y="' + (y - 8) + '" fill="#e6edf3" font-size="13" font-weight="700" text-anchor="middle">' + (v ? fmt(v) : "0") + '</text>';
+      svg += '<text x="' + (x + bw/2) + '" y="' + (H - 10) + '" fill="#8b97a8" font-size="12" text-anchor="middle">' + m[1] + '</text>';
+    });
+    svg += '</svg>';
+    document.getElementById("chart").innerHTML = svg;
+  }
+
+  // панель редактирования
+  var panel = document.getElementById("panel");
+  var mi = document.getElementById("month-inputs");
+  MONTHS.forEach(function(m){
+    var l = document.createElement("label");
+    l.textContent = m[1] + " (₽)";
+    var inp = document.createElement("input");
+    inp.type = "number"; inp.min = "0"; inp.id = "inp-m-" + m[0];
+    l.appendChild(inp); mi.appendChild(l);
+  });
+
+  function fillPanel(){
+    MONTHS.forEach(function(m){ document.getElementById("inp-m-" + m[0]).value = S.months[m[0]] || ""; });
+    document.getElementById("inp-tin").value = S.tokens.in || "";
+    document.getElementById("inp-tout").value = S.tokens.out || "";
+    document.getElementById("inp-tcache").value = S.tokens.cache || "";
+    document.getElementById("inp-earned").value = S.earned || "";
+  }
+  function openPanel(focusId){ panel.hidden = false; fillPanel(); if (focusId) document.getElementById(focusId).focus(); }
+
+  document.getElementById("btn-open-panel").onclick = function(){ openPanel(); };
+  document.querySelectorAll(".edit").forEach(function(b){
+    b.onclick = function(){ openPanel(b.getAttribute("data-focus")); };
+  });
+  document.getElementById("btn-close").onclick = function(){ panel.hidden = true; };
+  document.getElementById("btn-save").onclick = function(){
+    MONTHS.forEach(function(m){ S.months[m[0]] = num("inp-m-" + m[0]); });
+    S.tokens = { in: num("inp-tin"), out: num("inp-tout"), cache: num("inp-tcache") };
+    S.earned = num("inp-earned");
+    save(); render(); panel.hidden = true;
+  };
+  document.getElementById("btn-reset").onclick = function(){
+    S = JSON.parse(JSON.stringify(DEF));
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    fillPanel(); render();
+  };
+
+  render();
+})();
+</script>
 </body>
 </html>
