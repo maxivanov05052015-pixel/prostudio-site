@@ -70,7 +70,7 @@
 <div class="grid">
   <div class="card"><button class="edit" data-focus="inp-vday" title="Изменить">✏</button>
     <div class="num blue" id="num-vday">0</div><div class="lbl">Посетителей за день</div>
-    <div class="hint">Яндекс.Метрика № 113954543</div></div>
+    <div class="hint" id="hint-vday">Яндекс.Метрика № 113954543</div></div>
   <div class="card"><button class="edit" data-focus="inp-vmonth" title="Изменить">✏</button>
     <div class="num blue" id="num-vmonth">0</div><div class="lbl">Посетителей за месяц</div>
     <div class="hint">Яндекс.Метрика № 113954543</div></div>
@@ -227,6 +227,19 @@
   };
 
   render();
+
+  // автообновление посетителей: GitHub Actions каждые 2 часа пишет visitors.json
+  fetch("visitors.json?ts=" + Date.now())
+    .then(r => r.ok ? r.json() : null)
+    .then(j => {
+      if (!j || !j.day || !j.month) return;
+      S.visitors = { day: j.day.users || 0, month: j.month.users || 0 };
+      render();
+      var when = new Date(j.updated).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+      var hv = document.getElementById("hint-vday");
+      if (hv) hv.textContent = "Метрика · обновлено " + when + " (авто)";
+    })
+    .catch(() => {});
 })();
 </script>
 </body>
